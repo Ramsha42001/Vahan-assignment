@@ -10,7 +10,7 @@ configure_logging()
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="Shashtra API",
+    title="Vahan Chat API",
     description="API for chat application with authentication",
     version="1.0.0"
 )

@@ -25,3 +25,5 @@ def get_model(temperature=0.3, top_p=0.7, top_k=40, max_output_tokens=1024):
     return model
 
 
+
+        

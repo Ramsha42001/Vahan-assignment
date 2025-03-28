@@ -1,0 +1,13 @@
+python-multipart
+fastapi
+google-cloud-firestore
+google-generativeai
+pinecone>=3.0.0
+python-dotenv
+redis
+google-cloud-aiplatform
+uvicorn
+pydantic
+passlib
+pyjwt
+websockets

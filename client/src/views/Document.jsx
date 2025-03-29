@@ -30,7 +30,7 @@ const Documents = () => {
 
   // // Get documents from Redux state
   // const documents = useSelector((state) => state.documents?.documents.documents|| []);
-  const documents=[]
+  const documents=[] 
 
   const state = useSelector((state) => state);
   console.log(state);

@@ -283,7 +283,6 @@ const Home = () => {
 
   return (
       <div className="min-h-screen flex overflow-hidden bg-gradient-to-br from-blue-50 to-white">
-        {/* Sidebar Component */}
 
       {/* Main Content - ChatGPT-like Interface */}
         <motion.div

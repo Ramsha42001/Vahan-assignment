@@ -19,12 +19,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DescriptionIcon from '@mui/icons-material/Description';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { useDispatch } from 'react-redux';
+import { createDocument } from '../redux/features/document/documentSlice';
 
 const Documents = () => {
   const [documents, setDocuments] = useState([]);
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchDocuments();
@@ -52,16 +55,11 @@ const Documents = () => {
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch('/api/documents/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        setOpenUploadDialog(false);
-        setSelectedFile(null);
-        fetchDocuments();
-      }
+      const token = localStorage.getItem('token');
+      await dispatch(createDocument({ documentData: formData, token }));
+      setOpenUploadDialog(false);
+      setSelectedFile(null);
+      fetchDocuments();
     } catch (error) {
       console.error('Error uploading document:', error);
     } finally {

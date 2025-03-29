@@ -1,0 +1,32 @@
+steps:
+  # Build and push the backend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/arcane-storm-443513-r8/shastraui:amd64', '.']
+    dir: '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/arcane-storm-443513-r8/shastraui:amd64']
+
+  # Deploy the backend to Cloud Run //
+  - name: 'google/cloud-sdk:latest'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'shastra-ui'
+      - '--image'
+      - 'gcr.io/arcane-storm-443513-r8/shastraui:amd64'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      # Add other deployment flags as needed
+
+
+# Images
+images:
+- gcr.io/arcane-storm-443513-r8/shastraui:amd64
+
+# Logging Options
+options:
+  logging: CLOUD_LOGGING_ONLY

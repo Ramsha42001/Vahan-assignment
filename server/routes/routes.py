@@ -1,5 +1,5 @@
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, UploadFile, HTTPException, File, Depends
 from storage.pinecone import pinecone_chat_index
 from storage.redis import redis_client
 from middlewares.token import verify_jwt_token
@@ -112,8 +112,9 @@ async def get_session_metrics(session_id: str, user_id: str = Depends(verify_jwt
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/upload")
-async def upload_file(file: bytes = File(...), user_id: str = Depends(verify_jwt_token)):
+async def upload_file(file: UploadFile = File(...), user_id: str = Depends(verify_jwt_token)):
     with tempfile.TemporaryDirectory() as temp_dir:
+        print(file)
         local_file_path = os.path.join(temp_dir, file.filename)
 
         try:

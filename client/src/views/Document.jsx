@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -19,29 +19,26 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DescriptionIcon from '@mui/icons-material/Description';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { useDispatch } from 'react-redux';
-import { createDocument } from '../redux/features/document/documentSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { createDocument, listDocuments } from '../redux/features/document/documentSlice';
 
 const Documents = () => {
-  const [documents, setDocuments] = useState([]);
-  const [openUploadDialog, setOpenUploadDialog] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [openUploadDialog, setOpenUploadDialog] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    fetchDocuments();
-  }, []);
+  // // Get documents from Redux state
+  // const documents = useSelector((state) => state.documents?.documents.documents|| []);
+  const documents=[]
 
-  const fetchDocuments = async () => {
-    try {
-      const response = await fetch('/api/documents');
-      const data = await response.json();
-      setDocuments(data);
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-    }
-  };
+  const state = useSelector((state) => state);
+  console.log(state);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    dispatch(listDocuments(token)); // Fetch documents on component mount
+  }, [dispatch]);
 
   const handleFileSelect = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -59,7 +56,8 @@ const Documents = () => {
       await dispatch(createDocument({ documentData: formData, token }));
       setOpenUploadDialog(false);
       setSelectedFile(null);
-      fetchDocuments();
+      // Optionally, you can re-fetch documents here if needed
+      dispatch(listDocuments(token));
     } catch (error) {
       console.error('Error uploading document:', error);
     } finally {
@@ -74,7 +72,7 @@ const Documents = () => {
       });
 
       if (response.ok) {
-        fetchDocuments();
+        dispatch(listDocuments(localStorage.getItem('token'))); // Re-fetch documents after deletion
       }
     } catch (error) {
       console.error('Error deleting document:', error);

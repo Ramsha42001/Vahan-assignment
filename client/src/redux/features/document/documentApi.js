@@ -26,7 +26,7 @@ export const createDocumentApi = async (documentData,token) => {
 export const listDocumentsApi = async (token) => {
     try {
         const response = await network.get(
-            '/',
+            '/api/documents',
             {
                 headers: {
                     Authorization: `Bearer ${token}`

@@ -3,7 +3,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, UploadFile, HTTPE
 from storage.pinecone import pinecone_chat_index
 from storage.redis import redis_client
 from middlewares.token import verify_jwt_token
-from google.cloud import firestore
+from google.cloud import firestore,storage
 from models.embedding import get_embedding
 from services.chat import get_chat_response
 from services.login import login_user
@@ -114,7 +114,7 @@ async def get_session_metrics(session_id: str, user_id: str = Depends(verify_jwt
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...), user_id: str = Depends(verify_jwt_token)):
     with tempfile.TemporaryDirectory() as temp_dir:
-        print(file)
+        print(user_id)
         local_file_path = os.path.join(temp_dir, file.filename)
 
         try:
@@ -141,6 +141,39 @@ async def upload_file(file: UploadFile = File(...), user_id: str = Depends(verif
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error uploading file: {e}")
 
+@router.get("/documents")
+async def get_documents(user_id: str = Depends(verify_jwt_token)):
+    """Get list of documents uploaded by a user."""
+    try:
+        # Initialize GCS client
+        storage_client = storage.Client()
+        bucket = storage_client.bucket("documents-vahan")
+        
+        # List all blobs with user_id prefix
+        blobs = bucket.list_blobs(prefix=f"{user_id}/")
+        
+        documents = []
+        for blob in blobs:
+            # Get metadata
+            blob.reload()  # Ensure we have latest metadata
+            metadata = blob.metadata or {}
+            
+            documents.append({
+                "filename": metadata.get("filename", blob.name.split("/")[-1]),
+                "uploaded_by": metadata.get("uploaded_by", user_id),
+                "upload_date": metadata.get("upload_date"),
+                "url": blob.public_url,
+                "size": blob.size,
+            })
+            
+        return {
+            "documents": documents,
+            "total": len(documents)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error retrieving documents: {e}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving documents: {str(e)}")
 
 
 @router.websocket("/chat")

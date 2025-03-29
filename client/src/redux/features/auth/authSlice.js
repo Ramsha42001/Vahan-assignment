@@ -32,6 +32,7 @@ const authSlice = createSlice({
         logout(state) {
             state.isAuthenticated = false;
             state.user = null;
+            window.location.href='/'
         },
         signupRequest(state) {
             state.loading = true;
@@ -65,10 +66,10 @@ export const login = (credentials) => async (dispatch) => {
 };
 
 export const logoutFunction = () => async (dispatch) => {
-    dispatch(logout());
     localStorage.removeItem('token');
     localStorage.removeItem('email');
-    window.location.href = '/auth/login';
+    dispatch(logout());
+
 }
 
 export const signup = (credentials) => async (dispatch) => {

@@ -13,3 +13,4 @@ pyjwt
 websockets
 bcrypt
 google-cloud-documentai
+langchain

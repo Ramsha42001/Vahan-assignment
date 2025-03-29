@@ -2,10 +2,30 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchMetrics } from '../redux/features/metrics/metricSlice';
-import { CircularProgress, Typography, Paper, Grid, Box, IconButton } from '@mui/material';
+import { CircularProgress, Typography, Paper, Grid, Box, IconButton, Fade } from '@mui/material';
 import ReactApexChart from 'react-apexcharts';
 import Sidebar from '../components/sidebar';
 import MenuIcon from '@mui/icons-material/Menu';
+import { alpha } from '@mui/material/styles';
+
+// Add theme colors constant at the top
+const themeColors = {
+  primary: {
+    main: '#4F46E5',
+    light: '#6366F1',
+    dark: '#4338CA',
+    gradient: 'linear-gradient(to right, #4F46E5, #9333EA)',
+  },
+  secondary: {
+    main: '#9333EA',
+    light: '#A855F7',
+    dark: '#7E22CE',
+  },
+  background: {
+    paper: alpha('#fff', 0.9),
+    gradient: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+  },
+};
 
 const Metrics = () => {
     const dispatch = useDispatch();
@@ -86,15 +106,15 @@ const Metrics = () => {
                 opacityTo: 0.2,
                 stops: [0, 90, 100],
                 colorStops: [
-                    { offset: 0, color: '#FF9933', opacity: 0.8 },
-                    { offset: 50, color: '#f97316', opacity: 0.5 },
-                    { offset: 100, color: '#fb923c', opacity: 0.2 }
+                    { offset: 0, color: '#4F46E5', opacity: 0.8 },
+                    { offset: 50, color: '#6366F1', opacity: 0.5 },
+                    { offset: 100, color: '#818CF8', opacity: 0.2 }
                 ]
             }
         },
         markers: {
             size: 4,
-            colors: ['#FF9933'],
+            colors: [themeColors.primary.main],
             strokeColors: '#fff',
             strokeWidth: 2,
             hover: {
@@ -225,7 +245,7 @@ const Metrics = () => {
                     value: {
                         show: true,
                         fontSize: '24px',
-                        color: '#FF9933',
+                        color: themeColors.primary.main,
                         offsetY: 0,
                         formatter: (val) => val.toFixed(1) + '%'
                     }
@@ -238,8 +258,8 @@ const Metrics = () => {
                 shade: 'dark',
                 type: 'horizontal',
                 shadeIntensity: 0.5,
-                gradientToColors: ['#f97316'],
-                inverseColors: true,
+                gradientToColors: [themeColors.secondary.main],
+                inverseColors: false,
                 opacityFrom: 1,
                 opacityTo: 1,
                 stops: [0, 100]
@@ -249,7 +269,7 @@ const Metrics = () => {
             lineCap: 'round'
         },
         labels: ['Progress'],
-        colors: ['#FF9933']
+        colors: [themeColors.primary.main]
     };
 
     // Add new configuration for percentile comparison chart
@@ -270,9 +290,15 @@ const Metrics = () => {
                 borderRadius: 8,
                 columnWidth: '60%',
                 distributed: true,
+                backgroundBarColors: ['#f8f9fa'],
+                backgroundBarRadius: 8,
             }
         },
-        colors: ['#FF9933', '#f97316', '#ea580c'],
+        colors: [
+            themeColors.primary.main,
+            themeColors.primary.light,
+            themeColors.secondary.light
+        ],
         dataLabels: {
             enabled: true,
             formatter: (val) => val.toFixed(3) + 's',
@@ -309,7 +335,7 @@ const Metrics = () => {
             height: 250,
             fontFamily: 'Inter, sans-serif',
         },
-        colors: ['#FF9933', '#f97316'],
+        colors: [themeColors.primary.main, themeColors.secondary.main],
         labels: ['Successful', 'Failed'],
         plotOptions: {
             pie: {
@@ -320,6 +346,7 @@ const Metrics = () => {
                         total: {
                             show: true,
                             label: 'Total Requests',
+                            color: themeColors.primary.main,
                             formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0)
                         }
                     }
@@ -351,217 +378,226 @@ const Metrics = () => {
     }
 
     return (
-        <div className="min-h-screen flex">
-            <div className="flex-1 min-h-screen ">
-                <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-                    <IconButton
-                        className="block lg:hidden absolute top-4 left-4 z-50"
-                        onClick={() => setSidebarOpen(true)}
-                        sx={{ 
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 1)',
-                            },
-                            boxShadow: '0 2px 8px rgba(255, 153, 51, 0.15)',
-                            display: { lg: 'none' }
-                        }}
-                    >
-                        <MenuIcon sx={{ color: '#FF9933' }} />
-                    </IconButton>
-
-                    <Box sx={{ 
-                        width: '100%',
-                        pt: { xs: '60px', sm: 3 },
-                        minHeight: '100vh',
-                        backgroundColor: '#FFFFFF',
-                    }}>
+        <Box className="p-8 bg-gradient-to-br from-gray-50 to-purple-50 min-h-screen">
+            <Box className="max-w-7xl mx-auto">
+                {/* Header Section */}
+                <Box className="flex justify-between items-center mb-8">
+                    <Box>
                         <Typography 
                             variant="h4" 
-                            sx={{ 
-                                mb: 4,
-                                color: '#000000',
-                                fontWeight: 600,
-                                fontSize: { xs: '1.5rem', sm: '2rem' }
+                            className="text-gray-800 font-bold tracking-tight"
+                            sx={{
+                                background: 'linear-gradient(to right, #4F46E5, #9333EA)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
                             }}
                         >
-                            Performance Metrics Dashboard
+                            Performance Metrics
                         </Typography>
-                        
-                        <Grid container spacing={3}>
-                            {/* Latency Over Time Chart - Full Width */}
-                            <Grid item xs={12}>
-                                <Paper 
-                                    elevation={3}
-                                    sx={{ 
-                                        p: 3,
-                                        borderRadius: 2,
-                                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98))',
-                                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
-                                    }}
-                                >
-                                    <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
-                                        Latency Over Time
-                                    </Typography>
-                                    <ReactApexChart
-                                        options={{
-                                            ...latencyTimeSeriesOptions,
-                                            colors: ['#1E90FF'],
-                                        }}
-                                        series={[{ name: 'Latency', data: prepareLatencyData(metrics) }]}
-                                        type="area"
-                                        height={350}
-                                    />
-                                </Paper>
-                            </Grid>
-
-                            {/* Percentile Latencies */}
-                            <Grid item xs={12} md={6}>
-                                <Paper 
-                                    elevation={3}
-                                    sx={{ 
-                                        p: 3,
-                                        borderRadius: 2,
-                                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98))',
-                                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
-                                    }}
-                                >
-                                    <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
-                                        Latency Percentiles
-                                    </Typography>
-                                    <ReactApexChart
-                                        options={{
-                                            ...percentileChartOptions,
-                                            colors: ['#1E90FF', '#4682B4', '#5F9EA0'],
-                                        }}
-                                        series={[{
-                                            name: 'Latency',
-                                            data: [
-                                                metrics?.p50_latency || 0,
-                                                metrics?.p95_latency || 0,
-                                                metrics?.p99_latency || 0
-                                            ]
-                                        }]}
-                                        type="bar"
-                                        height={250}
-                                    />
-                                </Paper>
-                            </Grid>
-
-                            {/* Request Statistics */}
-                            <Grid item xs={12} md={6}>
-                                <Paper 
-                                    elevation={3}
-                                    sx={{ 
-                                        p: 3,
-                                        borderRadius: 2,
-                                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98))',
-                                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
-                                    }}
-                                >
-                                    <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
-                                        Request Statistics
-                                    </Typography>
-                                    <ReactApexChart
-                                        options={{
-                                            ...requestStatsOptions,
-                                            colors: ['#1E90FF', '#4682B4'],
-                                        }}
-                                        series={[
-                                            metrics?.successful_requests || 0,
-                                            (metrics?.total_requests || 0) - (metrics?.successful_requests || 0)
-                                        ]}
-                                        type="donut"
-                                        height={250}
-                                    />
-                                </Paper>
-                            </Grid>
-
-                            {/* Success Rate */}
-                            <Grid item xs={12} md={4}>
-                                <Paper 
-                                    elevation={3}
-                                    sx={{ 
-                                        p: 3,
-                                        borderRadius: 2,
-                                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98))',
-                                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
-                                    }}
-                                >
-                                    <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
-                                        Success Rate
-                                    </Typography>
-                                    <ReactApexChart
-                                        options={{
-                                            ...gaugeOptions,
-                                            labels: ['Success Rate'],
-                                            colors: ['#1E90FF'],
-                                        }}
-                                        series={[metrics?.success_rate * 100 || 0]}
-                                        type="radialBar"
-                                        height={250}
-                                    />
-                                </Paper>
-                            </Grid>
-
-                            {/* Average Latency */}
-                            <Grid item xs={12} md={4}>
-                                <Paper 
-                                    elevation={3}
-                                    sx={{ 
-                                        p: 3,
-                                        borderRadius: 2,
-                                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98))',
-                                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
-                                    }}
-                                >
-                                    <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
-                                        Average Latency
-                                    </Typography>
-                                    <Typography 
-                                        variant="h3" 
-                                        sx={{ 
-                                            color: '#1E90FF',
-                                            fontWeight: 600,
-                                            textAlign: 'center',
-                                            mt: 4
-                                        }}
-                                    >
-                                        {metrics?.avg_latency?.toFixed(3)}s
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-
-                            {/* Context Relevance */}
-                            <Grid item xs={12} md={4}>
-                                <Paper 
-                                    elevation={3}
-                                    sx={{ 
-                                        p: 3,
-                                        borderRadius: 2,
-                                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98))',
-                                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
-                                    }}
-                                >
-                                    <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
-                                        Context Relevance
-                                    </Typography>
-                                    <ReactApexChart
-                                        options={{
-                                            ...gaugeOptions,
-                                            labels: ['Relevance'],
-                                            colors: ['#1E90FF'],
-                                        }}
-                                        series={[metrics?.avg_context_relevance * 100 || 0]}
-                                        type="radialBar"
-                                        height={250}
-                                    />
-                                </Paper>
-                            </Grid>
-                        </Grid>
+                        <Typography variant="subtitle1" className="text-gray-500 mt-1">
+                            Monitor and analyze system performance
+                        </Typography>
                     </Box>
-                </div>
-            </div>
-        </div>
+                </Box>
+
+                <Fade in={true}>
+                    <Grid container spacing={3}>
+                        {/* Latency Over Time Chart */}
+                        <Grid item xs={12}>
+                            <Paper 
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    borderRadius: '16px',
+                                    border: '1px solid',
+                                    borderColor: 'rgba(145, 158, 171, 0.12)',
+                                    boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12)',
+                                    background: alpha('#fff', 0.9),
+                                    backdropFilter: 'blur(6px)'
+                                }}
+                            >
+                                <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
+                                    Latency Over Time
+                                </Typography>
+                                <ReactApexChart
+                                    options={{
+                                        ...latencyTimeSeriesOptions,
+                                        colors: [themeColors.primary.main],
+                                    }}
+                                    series={[{ name: 'Latency', data: prepareLatencyData(metrics) }]}
+                                    type="area"
+                                    height={350}
+                                />
+                            </Paper>
+                        </Grid>
+
+                        {/* Percentile Latencies */}
+                        <Grid item xs={12} md={6}>
+                            <Paper 
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    borderRadius: '16px',
+                                    border: '1px solid',
+                                    borderColor: 'rgba(145, 158, 171, 0.12)',
+                                    boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12)',
+                                    background: alpha('#fff', 0.9),
+                                    backdropFilter: 'blur(6px)'
+                                }}
+                            >
+                                <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
+                                    Latency Percentiles
+                                </Typography>
+                                <ReactApexChart
+                                    options={{
+                                        ...percentileChartOptions,
+                                        colors: [
+                                            themeColors.primary.main,
+                                            themeColors.primary.light,
+                                            themeColors.secondary.light
+                                        ],
+                                    }}
+                                    series={[{
+                                        name: 'Latency',
+                                        data: [
+                                            metrics?.p50_latency || 0,
+                                            metrics?.p95_latency || 0,
+                                            metrics?.p99_latency || 0
+                                        ]
+                                    }]}
+                                    type="bar"
+                                    height={250}
+                                />
+                            </Paper>
+                        </Grid>
+
+                        {/* Request Statistics */}
+                        <Grid item xs={12} md={6}>
+                            <Paper 
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    borderRadius: '16px',
+                                    border: '1px solid',
+                                    borderColor: 'rgba(145, 158, 171, 0.12)',
+                                    boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12)',
+                                    background: alpha('#fff', 0.9),
+                                    backdropFilter: 'blur(6px)'
+                                }}
+                            >
+                                <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
+                                    Request Statistics
+                                </Typography>
+                                <ReactApexChart
+                                    options={{
+                                        ...requestStatsOptions,
+                                        colors: [themeColors.primary.main, themeColors.secondary.main],
+                                    }}
+                                    series={[
+                                        metrics?.successful_requests || 0,
+                                        (metrics?.total_requests || 0) - (metrics?.successful_requests || 0)
+                                    ]}
+                                    type="donut"
+                                    height={250}
+                                />
+                            </Paper>
+                        </Grid>
+
+                        {/* Success Rate */}
+                        <Grid item xs={12} md={4}>
+                            <Paper 
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    borderRadius: '16px',
+                                    border: '1px solid',
+                                    borderColor: 'rgba(145, 158, 171, 0.12)',
+                                    boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12)',
+                                    background: alpha('#fff', 0.9),
+                                    backdropFilter: 'blur(6px)'
+                                }}
+                            >
+                                <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
+                                    Success Rate
+                                </Typography>
+                                <ReactApexChart
+                                    options={{
+                                        ...gaugeOptions,
+                                        colors: [themeColors.primary.main],
+                                    }}
+                                    series={[metrics?.success_rate * 100 || 0]}
+                                    type="radialBar"
+                                    height={250}
+                                />
+                            </Paper>
+                        </Grid>
+
+                        {/* Average Latency */}
+                        <Grid item xs={12} md={4}>
+                            <Paper 
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    borderRadius: '16px',
+                                    border: '1px solid',
+                                    borderColor: 'rgba(145, 158, 171, 0.12)',
+                                    boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12)',
+                                    background: alpha('#fff', 0.9),
+                                    backdropFilter: 'blur(6px)'
+                                }}
+                            >
+                                <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
+                                    Average Latency
+                                </Typography>
+                                <Typography 
+                                    variant="h3" 
+                                    sx={{ 
+                                        background: themeColors.primary.gradient,
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        fontWeight: 600,
+                                        textAlign: 'center',
+                                        mt: 4
+                                    }}
+                                >
+                                    {metrics?.avg_latency?.toFixed(3)}s
+                                </Typography>
+                            </Paper>
+                        </Grid>
+
+                        {/* Context Relevance */}
+                        <Grid item xs={12} md={4}>
+                            <Paper 
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    borderRadius: '16px',
+                                    border: '1px solid',
+                                    borderColor: 'rgba(145, 158, 171, 0.12)',
+                                    boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12)',
+                                    background: alpha('#fff', 0.9),
+                                    backdropFilter: 'blur(6px)'
+                                }}
+                            >
+                                <Typography variant="h6" sx={{ mb: 2, color: '#000000' }}>
+                                    Context Relevance
+                                </Typography>
+                                <ReactApexChart
+                                    options={{
+                                        ...gaugeOptions,
+                                        labels: ['Relevance'],
+                                        colors: [themeColors.primary.main],
+                                    }}
+                                    series={[metrics?.avg_context_relevance * 100 || 0]}
+                                    type="radialBar"
+                                    height={250}
+                                />
+                            </Paper>
+                        </Grid>
+                    </Grid>
+                </Fade>
+            </Box>
+        </Box>
     );
 };
 

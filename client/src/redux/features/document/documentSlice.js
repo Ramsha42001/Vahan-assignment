@@ -45,7 +45,7 @@ const documentSlice = createSlice({
             state.error = null;
         },
         deleteDocumentSuccess(state, action) {
-            state.documents = state.documents.filter(doc => doc.id !== action.payload);
+           
             state.loading = false;
         },
         deleteDocumentFailure(state, action) {
@@ -102,13 +102,20 @@ export const listDocuments = (email) => async (dispatch) => {
 };
 
 export const deleteDocument = (filename) => async (dispatch) => {
+    console.log('Delete document action triggered for:', filename); // Debug log
     dispatch(deleteDocumentRequest());
     try {
         const token = localStorage.getItem('token');
-        await deleteDocumentApi(filename,token);
+        if (!token) {
+            throw new Error('No authentication token found');
+        }
+        await deleteDocumentApi(filename, token);
         dispatch(deleteDocumentSuccess(filename));
+        return true; // Indicate success
     } catch (error) {
+        console.error('Delete document error:', error);
         dispatch(deleteDocumentFailure(error.message));
+        throw error;
     }
 };
 

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const api = axios.create({
-    baseURL: "http://localhost:8000",
+    baseURL: "https://vahan-server-410805250566.us-central1.run.app",
     // timeout: 5000,
     headers: {
     },

@@ -40,12 +40,11 @@ export const listDocumentsApi = async (token) => {
 };
 
 // API to delete a document by ID
-export const deleteDocumentApi = async (filename,token) => {
+export const deleteDocumentApi = async (filename, token) => {
     try {
-        const response = await network.post(
-            `/`, 
+        const response = await network.del(
+            `/api/documents/${filename}`,
             {
-                file_name:filename,
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

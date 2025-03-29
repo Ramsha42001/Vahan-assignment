@@ -25,7 +25,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await dispatch(login(formData)); 
-    navigate('/user/home'); 
+    navigate('/user/document'); 
   };
 
   useEffect(()=>{

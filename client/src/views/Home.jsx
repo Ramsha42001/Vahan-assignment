@@ -28,8 +28,8 @@ import LockIcon from '@mui/icons-material/Lock';
 // Enhanced styled components with more modern and appealing styles
 const ChatHeader = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3),
-  borderBottom: '1px solid rgba(0, 123, 255, 0.1)',
-  background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+  borderBottom: '1px solid rgba(147, 51, 234, 0.1)',
+  background: 'linear-gradient(135deg, #f8f9fa 0%, #F3E8FF 100%)',
   backdropFilter: 'blur(10px)',
   boxShadow: '0 2px 15px rgba(0, 0, 0, 0.03)',
 }));
@@ -41,7 +41,7 @@ const MessageContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(3),
-  background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+  background: 'linear-gradient(135deg, #ffffff 0%, #F3E8FF 100%)',
   '&::-webkit-scrollbar': {
     width: '8px',
   },
@@ -50,10 +50,10 @@ const MessageContainer = styled(Box)(({ theme }) => ({
     borderRadius: '10px',
   },
   '&::-webkit-scrollbar-thumb': {
-    background: 'linear-gradient(45deg, #007bff, #0056b3)',
+    background: 'linear-gradient(45deg, #4F46E5, #9333EA)',
     borderRadius: '10px',
     '&:hover': {
-      background: 'linear-gradient(45deg, #0056b3, #003980)',
+      background: 'linear-gradient(45deg, #4338CA, #7E22CE)',
     },
   },
 }));
@@ -66,8 +66,8 @@ const MessageBubble = styled(Box)(({ theme, sender }) => ({
   marginLeft: sender === 'user' ? 'auto' : '0',
   marginRight: sender === 'user' ? '0' : 'auto',
   background: sender === 'user'
-    ? 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
-    : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+    ? 'linear-gradient(135deg, #4F46E5 0%, #9333EA 100%)'
+    : 'linear-gradient(135deg, #f8f9fa 0%, #F3E8FF 100%)',
   color: sender === 'user' ? '#fff' : '#333',
   boxShadow: '0 3px 15px rgba(0, 0, 0, 0.08)',
   transition: 'all 0.3s ease',
@@ -115,39 +115,34 @@ const Home = () => {
   }, []);
 
   // Load initial data from localStorage or query params
-    useEffect(() => {
-        const loadInitialData = () => {
-            const sessionIdFromQuery = new URLSearchParams(location.search).get('session_id');
+  useEffect(() => {
+    const loadInitialData = () => {
+      const sessionIdFromQuery = new URLSearchParams(location.search).get('session_id');
 
-            if (sessionIdFromQuery) {
-                const newSession = {
-                    id: sessionIdFromQuery,
-                    name: `Customer Support Chatbot`,
-                    createdAt: new Date().toISOString()
-                };
-                setCurrentSession(newSession);
-                 // Load messages for the session from localStorage
-                const savedMessages = JSON.parse(localStorage.getItem(`messages_${sessionIdFromQuery}`) || '[]');
-                setMessages(savedMessages);
-                dispatch(websocketConnect(`wss://your-websocket-url/api/chat?session_id=${sessionIdFromQuery}`));
-            }
+      if (sessionIdFromQuery) {
+        const newSession = {
+          id: sessionIdFromQuery,
+          name: `Customer Support Chatbot`,
+          createdAt: new Date().toISOString()
         };
+        setCurrentSession(newSession);
+        dispatch(websocketConnect(`wss://vahan-server-410805250566.us-central1.run.app/api/chat?session_id=${sessionIdFromQuery}&user_id=${localStorage.getItem('user_id')}`));
+      }
+    };
 
-        loadInitialData();
-    }, [location.search, dispatch]);
+    loadInitialData();
+  }, [location.search, dispatch]);
 
   // Add a dependency array to prevent infinite re-renders
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-
-
   // Load messages for the current session
   useEffect(() => {
     if (currentSession) {
       // Connect to WebSocket when the component mounts
-      socketRef.current = new WebSocket(`wss://shastra-service-410805250566.us-central1.run.app/api/chat?session_id=${currentSession.id}`);
+      socketRef.current = new WebSocket(`wss://vahan-server-410805250566.us-central1.run.app/api/chat?session_id=${currentSession.id}&user_id=${localStorage.getItem('user_id')}`);
 
       socketRef.current.onopen = () => {
         console.log('WebSocket connection established');
@@ -206,13 +201,8 @@ const Home = () => {
       setCurrentSession(newSession);
       setMessages([]);
 
-      // Save to localStorage
-      localStorage.setItem(`messages_${newSession.id}`, JSON.stringify([]));
-
       // Connect to WebSocket
-      dispatch(websocketConnect(`wss://your-websocket-url/api/chat?session_id=${randomSessionId}`));
-
-
+      dispatch(websocketConnect(`wss://vahan-server-410805250566.us-central1.run.app/api/chat?session_id=${randomSessionId}&user_id=${localStorage.getItem('user_id')}`));
 
       setTimeout(() => {
         setNewSessionAnimation(false);
@@ -241,23 +231,19 @@ const Home = () => {
     if (!input.trim() || !currentSession) return;
 
     const userMessage = {
-      id: Date.now(),
       content: input,
       sender: 'user',
       timestamp: new Date().toISOString()
     };
 
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    setMessages(prevMessages => [...prevMessages, userMessage]);
     setInput('');
-    setIsThinking(true); // Start loading indicator
+    setIsThinking(true);
 
     // Send the message to the WebSocket
     if (socketRef.current) {
       socketRef.current.send(JSON.stringify(userMessage));
     }
-
-    localStorage.setItem(`messages_${currentSession.id}`, JSON.stringify(updatedMessages));
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -282,10 +268,9 @@ const Home = () => {
   );
 
   return (
-      <div className="min-h-screen flex overflow-hidden bg-gradient-to-br from-blue-50 to-white">
-
+    <div className="min-h-screen flex overflow-hidden bg-gradient-to-br from-gray-50 to-purple-50">
       {/* Main Content - ChatGPT-like Interface */}
-        <motion.div
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -395,15 +380,16 @@ const Home = () => {
                 <Button
                   type="submit"
                   variant="contained"
-                  className="bg-blue-500 hover:bg-blue-600" // Blue button
                   sx={{
                     borderRadius: '12px',
                     minWidth: '120px',
+                    background: 'linear-gradient(to right, #4F46E5, #9333EA)',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)',
                     textTransform: 'none',
                     fontSize: '1rem',
                     padding: '12px 24px',
                     '&:hover': {
+                      background: 'linear-gradient(to right, #4338CA, #7E22CE)',
                       boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
                       transform: 'translateY(-1px)',
                     },
@@ -429,8 +415,8 @@ const Home = () => {
                   width: 100,
                   height: 100,
                   margin: '0 auto 32px',
-                  background: 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)',
-                  boxShadow: '0 8px 25px rgba(0, 123, 255, 0.2)',
+                  background: 'linear-gradient(135deg, #4F46E5 0%, #9333EA 100%)',
+                  boxShadow: '0 8px 25px rgba(99, 102, 241, 0.2)',
                 }}
               >
                 <ChatBubbleOutlineIcon sx={{ fontSize: 50, color: 'white' }} />
@@ -469,13 +455,14 @@ const Home = () => {
                   py: 2,
                   px: 6,
                   borderRadius: '30px',
-                  background: 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)',
+                  background: 'linear-gradient(135deg, #4F46E5 0%, #9333EA 100%)',
                   fontSize: '1.1rem',
                   textTransform: 'none',
-                  boxShadow: '0 8px 25px rgba(0, 123, 255, 0.2)',
+                  boxShadow: '0 8px 25px rgba(99, 102, 241, 0.2)',
                   '&:hover': {
+                    background: 'linear-gradient(135deg, #4338CA, #7E22CE)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 30px rgba(0, 123, 255, 0.3)',
+                    boxShadow: '0 12px 30px rgba(99, 102, 241, 0.3)',
                   }
                 }}
                 startIcon={<AddIcon />}
@@ -505,17 +492,17 @@ const Home = () => {
                       onClick={() => handleSuggestionClick(suggestion)}
                       sx={{
                         borderRadius: '20px',
-                        border: '2px solid rgba(0, 123, 255, 0.1)',
+                        border: '2px solid rgba(99, 102, 241, 0.1)',
                         padding: '10px 20px',
-                        color: '#007bff',
+                        color: '#4F46E5',
                         background: 'rgba(255, 255, 255, 0.8)',
                         backdropFilter: 'blur(10px)',
                         transition: 'all 0.3s ease',
                         '&:hover': {
                           transform: 'translateY(-2px)',
                           background: 'rgba(255, 255, 255, 0.95)',
-                          border: '2px solid rgba(0, 123, 255, 0.3)',
-                          boxShadow: '0 5px 15px rgba(0, 123, 255, 0.1)',
+                          border: '2px solid rgba(99, 102, 241, 0.3)',
+                          boxShadow: '0 5px 15px rgba(99, 102, 241, 0.1)',
                         }
                       }}
                     >
@@ -527,7 +514,7 @@ const Home = () => {
             </motion.div>
           </Box>
         )}
-        </motion.div>
+      </motion.div>
 
       {/* Login Dialog */}
       <Dialog
@@ -605,7 +592,7 @@ const Home = () => {
           </Button>
         </DialogContent>
       </Dialog>
-      </div>
+    </div>
   );
 };
 

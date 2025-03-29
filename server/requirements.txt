@@ -12,6 +12,4 @@ passlib
 pyjwt
 websockets
 bcrypt
-pyjwt
 google-cloud-documentai
-websockets

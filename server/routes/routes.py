@@ -1,11 +1,5 @@
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
-from fastapi.responses import JSONResponse
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, UploadFile, HTTPException, File, Depends
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
-from fastapi.responses import JSONResponse
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
-from fastapi.responses import JSONResponse
 from storage.pinecone import pinecone_chat_index
 from storage.redis import redis_client
 from middlewares.token import verify_jwt_token
@@ -192,7 +186,7 @@ async def get_documents(user_id: str = Depends(verify_jwt_token)):
 async def websocket_endpoint(
     websocket: WebSocket, 
     session_id: str,
-    user_id: str = Depends(lambda w=None: verify_jwt_token)
+    user_id: str
 ):
     await websocket.accept()
     if user_id is None:

@@ -23,7 +23,7 @@ Vahan is a powerful document-based conversational AI system that processes uploa
 
 Vahan Chatbot's architecture is designed for modularity, scalability, and resilience.  It follows a microservices-oriented approach:
 
-![Untitled diagram-2025-03-19-184320](https://github.com/user-attachments/assets/661a1188-4d86-4082-8442-72012c4ea7f2)
+![Untitled diagram-2025-03-29-114219](https://github.com/user-attachments/assets/86a6fbff-3bd8-4421-b168-30a7e835dfeb)
 
 ## Key Features, Technologies, Design, and Usage of Vahan
 

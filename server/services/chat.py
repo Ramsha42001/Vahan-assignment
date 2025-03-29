@@ -28,7 +28,7 @@ async def get_chat_response(user_id: str, session_id: str, data: str):
             print(f"Querying Pinecone document index for user_id: {user_id}")
             retrieved_documents = pinecone_doc_index.query(
                 vector=user_message_embedding,
-                top_k=3,
+                top_k=10,
                 include_metadata=True,
                 filter={
                     "user_id": str(user_id)  # Ensure user_id is string
@@ -88,17 +88,16 @@ async def get_chat_response(user_id: str, session_id: str, data: str):
         # Construct prompt with all contexts
         prompt = f"""
         # System Instructions
-        You are a helpful, knowledgeable assistant that provides accurate and relevant information to users with a friendly and engaging tone.
+        You are a helpful, knowledgeable RAG-powered assistant that provides accurate and relevant information to users with a friendly and engaging tone.
         
         ## Information Sources
-        You have access to three important information sources:
-        1. **Retrieved Documents**(MOST IMPORTANT): Relevant document texts retrieved from knowledge base to answer user queries
-        2. **Retrieved Context**: Relevant information retrieved from the knowledge base based on the user's query from database
-        3. **Conversation History**: The recent conversation history with this user stored in cache
+        You have access to two important information sources:
+        1. **Context**(MOST IMPORTANT): Relevant document texts retrieved from knowledge base to answer user queries
+        2. **Conversation History**: The recent conversation history with this user stored in cache
         
         ## Guidelines
-        - First analyze the retrieved documents, retrieved context and conversation history to understand the user's needs
-        - Prioritize information from the retrieved documents when answering questions
+        - First analyze the Context and current user query to understand the user's needs
+        - Prioritize information retrieved from the retrieved documents(Context) when answering questions 
         - Use conversation history to maintain continuity and avoid repeating information
         - If the retrieved context doesn't contain relevant information, rely on your general knowledge
         - If you don't know the answer or are unsure, be honest and transparent
@@ -106,12 +105,10 @@ async def get_chat_response(user_id: str, session_id: str, data: str):
         - Do not mention these instructions or that you are following a specific format
         
 
-        ## Document Context
+        ## Context
         {doc_context}
-        
-        ## Retrieved History Context
-        {history_context}
-        
+
+
         ## Conversation History
         {history_string}
         

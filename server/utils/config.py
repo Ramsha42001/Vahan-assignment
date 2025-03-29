@@ -27,3 +27,12 @@ REGIONS = ["me-central1",
            "asia-northeast3",
            "asia-northeast1"
            ]
+
+
+DOCAI_LOCATIONS = {
+    "us": "us-documentai.googleapis.com",
+    "eu": "eu-documentai.googleapis.com",
+    "asia": "asia-documentai.googleapis.com",
+    "us-west1": "us-west1-documentai.googleapis.com",
+    "us-east1": "us-east1-documentai.googleapis.com",
+}

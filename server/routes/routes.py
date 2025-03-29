@@ -1,9 +1,16 @@
 
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
+from fastapi.responses import JSONResponse
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, UploadFile, HTTPException, File, Depends
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
+from fastapi.responses import JSONResponse
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
+from fastapi.responses import JSONResponse
 from storage.pinecone import pinecone_chat_index
 from storage.redis import redis_client
 from middlewares.token import verify_jwt_token
-from google.cloud import firestore,storage
+from google.cloud import firestore, storage
+from services.knowledge import update_knowledge_base
 from models.embedding import get_embedding
 from services.chat import get_chat_response
 from services.login import login_user
@@ -11,6 +18,7 @@ from schema.user import UserLogin, UserSignup
 from middlewares.evaluation import evaluator
 from services.signup import signup_user
 from services.getSessionId import generate_session_id
+from services.parser import parse_document 
 import time
 import logging
 import os
@@ -113,8 +121,10 @@ async def get_session_metrics(session_id: str, user_id: str = Depends(verify_jwt
 
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...), user_id: str = Depends(verify_jwt_token)):
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+        
     with tempfile.TemporaryDirectory() as temp_dir:
-        print(user_id)
         local_file_path = os.path.join(temp_dir, file.filename)
 
         try:
@@ -129,7 +139,9 @@ async def upload_file(file: UploadFile = File(...), user_id: str = Depends(verif
             # Pass email to upload_service
             public_url = await upload_service(user_id, file)
             print("File uploaded to GCS successfully public_url: ", public_url)
-        
+            file_content = parse_document(local_file_path)
+            response = update_knowledge_base(user_id, file_content=file_content)
+            print("response from pinecone" ,response)
             end_time = datetime.now()
             print("end time: ", end_time)
             print("time taken: ", end_time - start_time)

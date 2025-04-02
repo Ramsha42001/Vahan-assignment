@@ -1,7 +1,7 @@
 # Frontend Documentation
 
 ## Table of Contents
-1. [Project Overview](./project-overview)
+1. [Project Overview](./project-overview.md)
 2. [Getting Started](./getting-started)
 3. [Project Structure](./project-structure)
 4. [Configuration](./configuration)
